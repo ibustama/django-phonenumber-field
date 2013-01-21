@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-
+import string
 from babel import Locale
 
 from phonenumbers.data import _COUNTRY_CODE_TO_REGION_CODE
@@ -16,7 +16,7 @@ class PhonePrefixSelect(Select):
     initial = None
 
     def __init__(self, initial=None):
-        choices = [('', '---------')]
+        choices = []
         locale = Locale(translation.get_language())
         for prefix, values in _COUNTRY_CODE_TO_REGION_CODE.iteritems():
             prefix = '+%d' % prefix
@@ -25,8 +25,8 @@ class PhonePrefixSelect(Select):
             for country_code in values:
                 country_name = locale.territories.get(country_code)
                 if country_name:
-                    choices.append((prefix, u'%s %s' % (country_name, prefix)))
-        return super(PhonePrefixSelect, self).__init__(choices=sorted(choices, key=lambda item: item[1]))
+                    choices.append((prefix, u'%s %s' % (prefix, country_name)))
+        return super(PhonePrefixSelect, self).__init__(choices=[('', '---')]+sorted(choices, key=lambda item: item[1][string.find(item[1], ' '):]))
 
     def render(self, name, value, *args, **kwargs):
         return super(PhonePrefixSelect, self).render(name, value or self.initial, *args, **kwargs)
