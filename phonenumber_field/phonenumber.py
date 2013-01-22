@@ -31,7 +31,8 @@ class PhoneNumber(phonenumbers.phonenumber.PhoneNumber):
         """
         checks wether the number supplied is actually valid
         """
-        return phonenumbers.is_valid_number(self)
+        return self.country_code is not None and self.national_number is not None
+        #return phonenumbers.is_valid_number(self)
 
     def format_as(self, format):
         if self.is_valid():

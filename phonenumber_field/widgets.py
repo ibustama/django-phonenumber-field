@@ -1,14 +1,15 @@
 #-*- coding: utf-8 -*-
 import string
+import sys
+
 from babel import Locale
-
-from phonenumbers.data import _COUNTRY_CODE_TO_REGION_CODE
-
 from django.utils import translation
 from django.forms import Select, TextInput
 from django.forms.widgets import MultiWidget
+from phonenumbers.data import _COUNTRY_CODE_TO_REGION_CODE
 
-from phonenumber_field.phonenumber import to_python
+from phonenumber_field.phonenumber import PhoneNumber, to_python
+
 
 
 class PhonePrefixSelect(Select):
@@ -43,9 +44,19 @@ class PhoneNumberPrefixWidget(MultiWidget):
 
     def decompress(self, value):
         if value:
-            return value.split('.')
+            #print >>sys.stderr, value.country_code
+            #print >>sys.stderr, value.national_number
+            #return ['+%s'%(value.country_code), value.national_number]
+#            i = string.find(value, ' ')
+#            return [value[:i], value[i+1:]]
+            return value.split('-')
         return [None, None]
 
     def value_from_datadict(self, data, files, name):
         values = super(PhoneNumberPrefixWidget, self).value_from_datadict(data, files, name)
-        return '%s.%s' % tuple(values)
+        print >>sys.stderr, values
+        #return PhoneNumber(country_code=int(values[0][1:], national_number=int(values[1])))
+        phone_number_string = '%s-%s'%tuple(values)
+        if phone_number_string == '-':
+            return ''
+        return phone_number_string
